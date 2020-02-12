@@ -1,18 +1,21 @@
 import torch.utils.data
-from .base_data_loader import BaseDataLoader
+
+class BaseDataLoader():
+    def __init__(self): pass
+    def load_data(): return None
+    def initialize(self, opt): self.opt = opt
 
 
 def CreateDataset(opt):
+    '''
+    opt.csvfile
+    opt.dataroot
+    opt.filter_kd
+    '''
     dataset = None
     if opt.dataset_mode == 'pdbbind':
         from .pdbbind_dataset import PdbBindDataset
         dataset = PdbBindDataset()
-    elif opt.dataset_mode == 'pdbbind_docked':
-        from .pdbbind_docked_dataset import PdbBindDockedDataset
-        dataset = PdbBindDockedDataset()
-    elif opt.dataset_mode == 'jak2':
-        from .jak2_dataset import Jak2Dataset
-        dataset = Jak2Dataset()
     else:
         raise ValueError("Dataset [%s] not recognized." % opt.dataset_mode)
 
@@ -27,7 +30,8 @@ class CustomDatasetDataLoader(BaseDataLoader):
         self.dataset = CreateDataset(opt)
         self.dataloader = torch.utils.data.DataLoader(
             self.dataset, batch_size=opt.batch_size,
-            shuffle=not opt.serial_batches, num_workers=int(opt.nThreads))
+            shuffle=not opt.serial_batches, num_workers=int(opt.nThreads),
+            pin_memory=True)
 
     def __iter__(self):
         for i, data in enumerate(self.dataloader):

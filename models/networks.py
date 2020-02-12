@@ -140,9 +140,11 @@ def print_network(net, opt):
     num_params = 0
     for param in net.parameters():
         num_params += param.numel()
-    print(net)
+    # print(net)
     if opt.channels == 'gnina':
         print(summary(net, (34, 48, 48, 48)))
+    if opt.channels == 'kdeep':
+        print(summary(net, (16, 25, 25, 25)))
     print('Total number of parameters: %d' % num_params)
 
 

@@ -489,7 +489,7 @@ class KDeepNetworkGenerator(nn.Module):
     def __init__(self, input_nc, norm_layer=nn.BatchNorm3d, use_dropout=False, gpu_ids=[], padding_type='reflect'):
         super(KDeepNetworkGenerator, self).__init__()
         self.gpu_ids = gpu_ids
-        features = [nn.Conv3d(input_nc, 96, kernel_size=3, stride=2, padding=1),
+        features = [nn.Conv3d(input_nc, 96, kernel_size=1, stride=2, padding=1),
                     nn.ReLU(inplace=True),
                     Fire(96, 16, 64, 64),
                     Fire(128, 16, 64, 64),

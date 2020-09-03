@@ -1,10 +1,8 @@
-import torch
-from collections import OrderedDict
-from torch.autograd import Variable
-import itertools
 import sys
+
+import torch
+
 sys.path.append('..')
-from util import util
 from .base_model import BaseModel
 from . import networks
 
@@ -16,7 +14,8 @@ class GninaModel(BaseModel):
     def initialize(self, opt):
         BaseModel.initialize(self, opt)
 
-        self.net = networks.define_gnina_net(input_nc=opt.input_nc, model=opt.model, gpu_ids=opt.gpu_ids, init_type=opt.init_type)
+        self.net = networks.define_gnina_net(input_nc=opt.input_nc, model=opt.model, gpu_ids=opt.gpu_ids,
+                                             init_type=opt.init_type)
 
         if not self.isTrain or opt.continue_train:
             which_epoch = opt.which_epoch
@@ -30,7 +29,7 @@ class GninaModel(BaseModel):
                 self.optimizer = torch.optim.Adam(self.net.parameters(),
                                                   lr=opt.lr, betas=(opt.beta1, 0.999))
             else:
-                 raise ValueError
+                raise ValueError
             self.optimizers = []
             self.schedulers = []
             self.optimizers.append(self.optimizer)
@@ -49,15 +48,15 @@ class GninaModel(BaseModel):
             affinities = affinities.cuda(self.gpu_ids[0], non_blocking=True)
         self.input = grids
         self.affinities = affinities
-    
+
     def forward(self):
         self.preds = self.net(self.input)
-    
+
     def backward(self):
         loss = self.criterion(self.preds, self.affinities)
         loss.backward()
         self.loss = loss
-    
+
     def optimize_parameters(self):
         self.forward()
         self.optimizer.zero_grad()
@@ -81,7 +80,8 @@ class GninaPoseModel(BaseModel):
     def initialize(self, opt):
         BaseModel.initialize(self, opt)
 
-        self.net = networks.define_gnina_net(input_nc=opt.input_nc, model=opt.model, gpu_ids=opt.gpu_ids, init_type=opt.init_type)
+        self.net = networks.define_gnina_net(input_nc=opt.input_nc, model=opt.model, gpu_ids=opt.gpu_ids,
+                                             init_type=opt.init_type)
 
         if not self.isTrain or opt.continue_train:
             which_epoch = opt.which_epoch
@@ -96,7 +96,7 @@ class GninaPoseModel(BaseModel):
                 self.optimizer = torch.optim.Adam(self.net.parameters(),
                                                   lr=opt.lr, betas=(opt.beta1, 0.999))
             else:
-                 raise ValueError
+                raise ValueError
             self.optimizers = []
             self.schedulers = []
             self.optimizers.append(self.optimizer)
@@ -104,7 +104,7 @@ class GninaPoseModel(BaseModel):
                 self.schedulers.append(networks.get_scheduler(optimizer, opt))
 
         print('---------- Networks initialized -------------')
-        #networks.print_network(self.net, opt)
+        # networks.print_network(self.net, opt)
         print('-----------------------------------------------')
 
     def set_input(self, input):
@@ -130,7 +130,7 @@ class GninaPoseModel(BaseModel):
         loss = loss_pose + loss_affinity
         loss.backward()
         self.loss = loss
-    
+
     def optimize_parameters(self):
         self.forward()
         self.optimizer.zero_grad()

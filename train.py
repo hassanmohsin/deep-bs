@@ -1,8 +1,10 @@
 import time
-from options.train_options import TrainOptions
+
+from tqdm import tqdm
+
 from data.data_loader import CreateDataLoader
 from models.models import create_model
-from tqdm import tqdm
+from options.train_options import TrainOptions
 
 opt = TrainOptions().parse()
 data_loader = CreateDataLoader(opt)
@@ -18,7 +20,7 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
     iter_data_time = time.time()
     epoch_iter = 0
 
-    with tqdm(total=int(dataset_size/opt.batch_size)+1) as pbar:
+    with tqdm(total=int(dataset_size / opt.batch_size) + 1) as pbar:
         for i, data in enumerate(dataset):
             iter_start_time = time.time()
             if total_steps % opt.print_freq == 0:

@@ -1,8 +1,8 @@
 import argparse
 import sys
 
-from . import grid
 from . import load, save
+
 
 def convert(args):
     # guess input/output format from filename
@@ -10,6 +10,7 @@ def convert(args):
     output_fmt = output.split('.')[-1]
     grid = load(open(args.input), format=input_fmt)
     save(grid, args.output, format=output_fmt)
+
 
 def subtract(args):
     ref = load(open(args.ref), format="map")
@@ -29,6 +30,7 @@ def subtract(args):
             raise AssertionError('The size of the map must be match. Use --resample keyword.')
     save(diff, open(args.output, 'w'), format="map")
 
+
 def multiply(args):
     grid = load(open(args.mapfile), format="map")
     if args.exponent:
@@ -37,6 +39,7 @@ def multiply(args):
         grid = grid * args.factor
     diff = ref - target
     save(diff, open(args.output, 'w'), format="map")
+
 
 def run(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser()
@@ -68,6 +71,7 @@ def run(argv=sys.argv[1:]):
 
     args = parser.parse_args()
     args.func(args)
+
 
 if __name__ == '__main__':
     run()

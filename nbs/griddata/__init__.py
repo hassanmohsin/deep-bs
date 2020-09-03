@@ -1,8 +1,9 @@
 """This module provides a package that can read/write grid data format"""
 
 from .autodock import AutoDockMap
-from .opendx import OpenDX
 from .ccp4 import CCP4
+from .opendx import OpenDX
+
 
 def load(file, format):
     """Load grid-format data
@@ -28,6 +29,7 @@ def load(file, format):
 
     grid = reader.load(file)
     return grid
+
 
 def save(grid, file, format):
     """Writes grid data to a file

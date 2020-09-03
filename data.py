@@ -3,7 +3,9 @@ import glob
 import os
 
 import luigi
+
 from data.pdbbind_dataset import GridPDB
+
 
 class Babel(luigi.Task):
     fmt_in = luigi.Parameter()
@@ -69,6 +71,7 @@ class ParseSDF(luigi.Task):
 
 class ExtractCoordinates(luigi.WrapperTask):
     dataroot = luigi.Parameter()
+
     def requires(self):
         for pdbdir in glob.glob(f'{self.dataroot}/*'):
             code = os.path.basename(pdbdir)
@@ -82,13 +85,14 @@ class ExtractCoordinates(luigi.WrapperTask):
                 yield ParseSDF(ligfile=fn, code=code)
             for fn in glob.glob('{}/*_low_*.sdf'.format(pdbdir)):
                 yield ParseSDF(ligfile=fn, code=code)
-                
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--worker', type=int, default=1, help='number of workers')
-    parser.add_argument('--dataroot', required=True, default='/home/sunhwan/work/pdbbind/2018/refined-set', help='data directory')
+    parser.add_argument('--dataroot', required=True, default='/home/sunhwan/work/pdbbind/2018/refined-set',
+                        help='data directory')
     args = parser.parse_args()
 
-    luigi.build([ExtractCoordinates(dataroot=args.dataroot)], workers=args.worker, local_scheduler=True, log_level='DEBUG')
-
+    luigi.build([ExtractCoordinates(dataroot=args.dataroot)], workers=args.worker, local_scheduler=True,
+                log_level='DEBUG')

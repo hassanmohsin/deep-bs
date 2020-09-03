@@ -1,6 +1,5 @@
 """AutoDock Grid Map read and write"""
 from __future__ import print_function
-import numpy as np
 
 from .grid import Grid
 
@@ -11,6 +10,7 @@ SPACING {spacing:4.3f}
 NELEMENTS {npts[0]} {npts[1]} {npts[2]}
 CENTER {center[0]:5.3f} {center[1]:5.3f} {center[2]:5.3f}
 """
+
 
 class AutoDockMap(object):
     """Class for handling AutoDock Map files"""
@@ -33,7 +33,7 @@ class AutoDockMap(object):
         spacing = float(header[3].split()[1])
         n_points = [int(_) for _ in header[4].split()[1:]]
         center = [float(_) for _ in header[5].split()[1:]]
-        shape = [n_points[i]+1 for i in range(3)]
+        shape = [n_points[i] + 1 for i in range(3)]
         n_elements = shape[0] * shape[1] * shape[2]
 
         self.paramfile = ''
@@ -78,7 +78,7 @@ class AutoDockMap(object):
                 'datafile': '',
                 'molecule': '',
                 'spacing': self.spacing[0],
-                'npts': (self.shape[0]-1, self.shape[1]-1, self.shape[2]-1),
+                'npts': (self.shape[0] - 1, self.shape[1] - 1, self.shape[2] - 1),
                 'center': self.center
             }
             file.write(_MAP_HEADER_TMPL.format(**meta))

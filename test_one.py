@@ -1,14 +1,13 @@
 import os
-from options.test_options import TestOptions
+
+import torch
+
+from data.base_data_loader import BaseDataLoader
+from data.base_dataset import BaseDataset
 from data.base_dataset import get_transform
 from data.pdbbind_dataset import GridPDB
-from data.base_dataset import BaseDataset
-from data.base_data_loader import BaseDataLoader
 from models.models import create_model
-import torch
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
+from options.test_options import TestOptions
 
 opt = TestOptions().parse()
 opt.serial_batches = True  # no shuffle
@@ -21,11 +20,12 @@ model = create_model(opt)
 protein_file = 'jak2-test/jak2_docked/input/3LPB_A.pdbqt'
 ligand_file = '/home/sunhwan/az5.pdbqt'
 
+
 class SingleDataset(BaseDataset):
     def initialize(self, opt):
         self.opt = opt
         self.transform = get_transform(opt)
-    
+
     def __len__(self):
         return 1
 
@@ -35,14 +35,14 @@ class SingleDataset(BaseDataset):
             pocket = GridPDB(pocket_pdbqt_file)
         else:
             raise Error("Please preprocess PDB files")
-            #pocket = GridPDB(pocketfile)
+            # pocket = GridPDB(pocketfile)
 
         ligand_pdbqt_file = ligand_file
         if os.path.exists(ligand_pdbqt_file):
             ligand = GridPDB(ligand_pdbqt_file)
         else:
             raise Error("Please preprocess ligand files")
-            #ligand = GridPDB(ligandfile)
+            # ligand = GridPDB(ligandfile)
 
         sample = {
             'code': '',
@@ -60,6 +60,7 @@ class SingleDataset(BaseDataset):
     def name(self):
         return 'SingleDataset'
 
+
 class SingleDataLoader(BaseDataLoader):
     def initialize(self, opt):
         BaseDataLoader.initialize(self, opt)
@@ -74,9 +75,15 @@ class SingleDataLoader(BaseDataLoader):
             if i >= self.opt.max_dataset_size: break
             yield data
 
-    def name(self): return 'CustomDatasetDataLoader'
-    def load_data(self): return self
-    def __len__(self): return min(len(self.dataset), self.opt.max_dataset_size)
+    def name(self):
+        return 'CustomDatasetDataLoader'
+
+    def load_data(self):
+        return self
+
+    def __len__(self):
+        return min(len(self.dataset), self.opt.max_dataset_size)
+
 
 data_loader = SingleDataLoader()
 data_loader.initialize(opt)

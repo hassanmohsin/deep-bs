@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 
+
 class Fire(nn.Module):
     def __init__(self, inplanes, squeeze_planes,
                  expand1x1_planes, expand3x3_planes):
@@ -22,10 +23,12 @@ class Fire(nn.Module):
             self.expand3x3_activation(self.expand3x3(x))
         ], 1)
 
+
 class Flatten(nn.Module):
     def forward(self, input):
         return input.view(input.size(0), -1)
-    
+
+
 class SqueezeNet(nn.Module):
     def __init__(self, input_nc):
         super().__init__()
@@ -43,7 +46,7 @@ class SqueezeNet(nn.Module):
                     Fire(384, 48, 192, 192),
                     Fire(384, 64, 256, 256),
                     Fire(512, 64, 256, 256)]
-        
+
         head = [Flatten(),
                 nn.Dropout(p=0.5),
                 nn.Linear(512, 128),
@@ -52,10 +55,10 @@ class SqueezeNet(nn.Module):
                 nn.Dropout(p=0.5),
                 nn.Linear(128, 1)
                 ]
-        
+
         self.features = nn.Sequential(*features)
         self.head = nn.Sequential(*head)
-    
+
     def forward(self, x):
         x = self.features(x)
         x = self.head(x)

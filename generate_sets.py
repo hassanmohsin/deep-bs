@@ -8,4 +8,3 @@ refined_df = df[df.code.isin(refined_ids)]
 core_df = df[~df.code.isin(refined_ids)]
 refined_df.to_csv('./data/refined_set.csv', index=None)
 core_df.to_csv('./data/core_set.csv', index=None)
-

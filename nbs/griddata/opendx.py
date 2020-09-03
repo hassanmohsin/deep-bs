@@ -1,7 +1,6 @@
 """OpenDX formatter"""
 
 from __future__ import print_function
-import numpy as np
 
 from .grid import Grid
 
@@ -20,6 +19,7 @@ component "positions" value 1
 component "connections" value 2
 component "data" value 3
 """
+
 
 class OpenDX(object):
     """OpenDX formatter"""
@@ -80,12 +80,12 @@ class OpenDX(object):
             origin=grid.origin, \
             spacing=grid.spacing, \
             n_elements=grid.n_elements \
-        ))
+            ))
         for i in range(grid.shape[0]):
             col = 0
             for j in range(grid.shape[1]):
                 for k in range(grid.shape[2]):
-                    idx = k*grid.shape[0]*grid.shape[1] + j*grid.shape[0] + i
+                    idx = k * grid.shape[0] * grid.shape[1] + j * grid.shape[0] + i
                     file.write(" %12.5E" % grid.elements[idx])
                     col += 1
                     if col == 3:

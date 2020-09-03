@@ -1,10 +1,13 @@
+import functools
+
 import torch
 import torch.nn as nn
-from torch.nn import init
-import functools
 from torch.autograd import Variable
+from torch.nn import init
 from torch.optim import lr_scheduler
 from torchsummary import summary
+
+
 ###############################################################################
 # Functions
 ###############################################################################
@@ -89,6 +92,7 @@ def get_scheduler(optimizer, opt):
         def lambda_rule(epoch):
             lr_l = 1.0 - max(0, epoch + 1 + opt.epoch_count - opt.niter) / float(opt.niter_decay + 1)
             return lr_l
+
         scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda_rule)
     elif opt.lr_policy == 'step':
         scheduler = lr_scheduler.StepLR(optimizer, step_size=opt.lr_decay_iters, gamma=0.1)
@@ -98,13 +102,14 @@ def get_scheduler(optimizer, opt):
         return NotImplementedError('learning rate policy [%s] is not implemented', opt.lr_policy)
     return scheduler
 
+
 def define_kdeep_net(input_nc, model='kdeep', norm='batch', use_dropout=False, init_type='normal', gpu_ids=[]):
     net = None
     use_gpu = len(gpu_ids) > 0
     norm_layer = get_norm_layer(norm_type=norm)
 
     if use_gpu:
-        assert(torch.cuda.is_available())
+        assert (torch.cuda.is_available())
 
     if model == 'kdeep':
         net = KDeepNetworkGenerator(input_nc, norm_layer=norm_layer, use_dropout=use_dropout, gpu_ids=gpu_ids)
@@ -122,7 +127,7 @@ def define_gnina_net(input_nc, model='gnina', norm='batch', use_dropout=False, i
     norm_layer = get_norm_layer(norm_type=norm)
 
     if use_gpu:
-        assert(torch.cuda.is_available())
+        assert (torch.cuda.is_available())
 
     if model == 'gnina':
         net = GninaNetworkGenerator(input_nc, norm_layer=norm_layer, use_dropout=use_dropout, gpu_ids=gpu_ids)
@@ -199,8 +204,9 @@ class GANLoss(nn.Module):
 # Code and idea originally from Justin Johnson's architecture.
 # https://github.com/jcjohnson/fast-neural-style/
 class ResnetGenerator(nn.Module):
-    def __init__(self, input_nc, output_nc, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False, n_blocks=6, gpu_ids=[], padding_type='reflect'):
-        assert(n_blocks >= 0)
+    def __init__(self, input_nc, output_nc, ngf=64, norm_layer=nn.BatchNorm2d, use_dropout=False, n_blocks=6,
+                 gpu_ids=[], padding_type='reflect'):
+        assert (n_blocks >= 0)
         super(ResnetGenerator, self).__init__()
         self.input_nc = input_nc
         self.output_nc = output_nc
@@ -219,18 +225,19 @@ class ResnetGenerator(nn.Module):
 
         n_downsampling = 2
         for i in range(n_downsampling):
-            mult = 2**i
+            mult = 2 ** i
             model += [nn.Conv2d(ngf * mult, ngf * mult * 2, kernel_size=3,
                                 stride=2, padding=1, bias=use_bias),
                       norm_layer(ngf * mult * 2),
                       nn.ReLU(True)]
 
-        mult = 2**n_downsampling
+        mult = 2 ** n_downsampling
         for i in range(n_blocks):
-            model += [ResnetBlock(ngf * mult, padding_type=padding_type, norm_layer=norm_layer, use_dropout=use_dropout, use_bias=use_bias)]
+            model += [ResnetBlock(ngf * mult, padding_type=padding_type, norm_layer=norm_layer, use_dropout=use_dropout,
+                                  use_bias=use_bias)]
 
         for i in range(n_downsampling):
-            mult = 2**(n_downsampling - i)
+            mult = 2 ** (n_downsampling - i)
             model += [nn.ConvTranspose2d(ngf * mult, int(ngf * mult / 2),
                                          kernel_size=3, stride=2,
                                          padding=1, output_padding=1,
@@ -304,13 +311,18 @@ class UnetGenerator(nn.Module):
         self.gpu_ids = gpu_ids
 
         # construct unet structure
-        unet_block = UnetSkipConnectionBlock(ngf * 8, ngf * 8, input_nc=None, submodule=None, norm_layer=norm_layer, innermost=True)
+        unet_block = UnetSkipConnectionBlock(ngf * 8, ngf * 8, input_nc=None, submodule=None, norm_layer=norm_layer,
+                                             innermost=True)
         for i in range(num_downs - 5):
-            unet_block = UnetSkipConnectionBlock(ngf * 8, ngf * 8, input_nc=None, submodule=unet_block, norm_layer=norm_layer, use_dropout=use_dropout)
-        unet_block = UnetSkipConnectionBlock(ngf * 4, ngf * 8, input_nc=None, submodule=unet_block, norm_layer=norm_layer)
-        unet_block = UnetSkipConnectionBlock(ngf * 2, ngf * 4, input_nc=None, submodule=unet_block, norm_layer=norm_layer)
+            unet_block = UnetSkipConnectionBlock(ngf * 8, ngf * 8, input_nc=None, submodule=unet_block,
+                                                 norm_layer=norm_layer, use_dropout=use_dropout)
+        unet_block = UnetSkipConnectionBlock(ngf * 4, ngf * 8, input_nc=None, submodule=unet_block,
+                                             norm_layer=norm_layer)
+        unet_block = UnetSkipConnectionBlock(ngf * 2, ngf * 4, input_nc=None, submodule=unet_block,
+                                             norm_layer=norm_layer)
         unet_block = UnetSkipConnectionBlock(ngf, ngf * 2, input_nc=None, submodule=unet_block, norm_layer=norm_layer)
-        unet_block = UnetSkipConnectionBlock(output_nc, ngf, input_nc=input_nc, submodule=unet_block, outermost=True, norm_layer=norm_layer)
+        unet_block = UnetSkipConnectionBlock(output_nc, ngf, input_nc=input_nc, submodule=unet_block, outermost=True,
+                                             norm_layer=norm_layer)
 
         self.model = unet_block
 
@@ -398,7 +410,7 @@ class NLayerDiscriminator(nn.Module):
         nf_mult_prev = 1
         for n in range(1, n_layers):
             nf_mult_prev = nf_mult
-            nf_mult = min(2**n, 8)
+            nf_mult = min(2 ** n, 8)
             sequence += [
                 nn.Conv2d(ndf * nf_mult_prev, ndf * nf_mult,
                           kernel_size=kw, stride=2, padding=padw, bias=use_bias),
@@ -407,7 +419,7 @@ class NLayerDiscriminator(nn.Module):
             ]
 
         nf_mult_prev = nf_mult
-        nf_mult = min(2**n_layers, 8)
+        nf_mult = min(2 ** n_layers, 8)
         sequence += [
             nn.Conv2d(ndf * nf_mult_prev, ndf * nf_mult,
                       kernel_size=kw, stride=1, padding=padw, bias=use_bias),
@@ -504,7 +516,7 @@ class KDeepNetworkGenerator(nn.Module):
                 nn.Linear(4096, 1)]
         model = features + head
         self.model = nn.Sequential(*model)
-    
+
     def forward(self, input):
         if len(self.gpu_ids) and isinstance(input.data, torch.cuda.FloatTensor):
             return nn.parallel.data_parallel(self.model, input, self.gpu_ids)
@@ -515,7 +527,7 @@ class KDeepNetworkGenerator(nn.Module):
 class GninaBlock(nn.Module):
     def __init__(self, in_size, in_channel, out_channel):
         super(GninaBlock, self).__init__()
-        out_size = int(in_size/2)
+        out_size = int(in_size / 2)
         self.pool = nn.AdaptiveMaxPool3d((out_size, out_size, out_size))
         self.conv = nn.Conv3d(in_channel, out_channel, kernel_size=3, stride=1, padding=1)
         self.activation = nn.ReLU(inplace=True)
@@ -524,8 +536,10 @@ class GninaBlock(nn.Module):
         x = self.conv(self.pool(x))
         return self.activation(x)
 
+
 class GninaNetworkGenerator(nn.Module):
-    def __init__(self, input_nc, norm_layer=nn.BatchNorm3d, use_dropout=False, n_blocks=6, gpu_ids=[], padding_type='reflect'):
+    def __init__(self, input_nc, norm_layer=nn.BatchNorm3d, use_dropout=False, n_blocks=6, gpu_ids=[],
+                 padding_type='reflect'):
         super(GninaNetworkGenerator, self).__init__()
         self.gpu_ids = gpu_ids
         features = [GninaBlock(48, 34, 32),
@@ -535,15 +549,17 @@ class GninaNetworkGenerator(nn.Module):
                 nn.Linear(27648, 1)]
         model = features + head
         self.model = nn.Sequential(*model)
-    
+
     def forward(self, input):
         if len(self.gpu_ids) and isinstance(input.data, torch.cuda.FloatTensor):
             return nn.parallel.data_parallel(self.model, input, self.gpu_ids)
         else:
             return self.model(input)
 
+
 class GninaPoseNetworkGenerator(nn.Module):
-    def __init__(self, input_nc, norm_layer=nn.BatchNorm3d, use_dropout=False, n_blocks=6, gpu_ids=[], padding_type='reflect'):
+    def __init__(self, input_nc, norm_layer=nn.BatchNorm3d, use_dropout=False, n_blocks=6, gpu_ids=[],
+                 padding_type='reflect'):
         super(GninaPoseNetworkGenerator, self).__init__()
         self.gpu_ids = gpu_ids
         features = [GninaBlock(48, 34, 32),
@@ -554,14 +570,13 @@ class GninaPoseNetworkGenerator(nn.Module):
         posehead = [Flatten(),
                     nn.Linear(27648, 2),
                     nn.Softmax()]
-     
+
         self.body = nn.Sequential(*features)
         self.affinity_head = nn.Sequential(*affhead)
         self.pose_head = nn.Sequential(*posehead)
-    
+
     def forward(self, input):
         if len(self.gpu_ids) and isinstance(input.data, torch.cuda.FloatTensor):
             return nn.parallel.data_parallel(self.model, input, self.gpu_ids)
         else:
             return self.model(input)
-

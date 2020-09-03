@@ -1,12 +1,12 @@
-name: 
+name: deep-bs
 channels:
   - torch
 dependencies:
-  - torch
   - python=3
   - numba
   - pandas
   - numpy
   - h5py
   - pip:
-    - tqdm
+      - tqdm
+      - torch

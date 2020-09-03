@@ -28,6 +28,7 @@ _smina_atom_data = """{Hydrogen, EL_TYPE_H, AD_TYPE_H, XS_TYPE_SIZE,"Hydrogen", 
 {Boron, EL_TYPE_B, AD_TYPE_B, XS_TYPE_B_H,"Boron", "B",	2.000000,	0.150000,	-0.001430,	33.510300,	0.770000,	1.900000,	true,	false,	false,	false},
 """
 
+
 class SminaAtomType:
     Hydrogen = 1
     PolarHydrogen = 2
@@ -58,65 +59,68 @@ class SminaAtomType:
     GenericMetal = 27
     Boron = 28
 
+
 class Element:
-    H    =  0;
-    C    =  1;
-    N    =  2;
-    O    =  3;
-    S    =  4;
-    P    =  5;
-    F    =  6;
-    Cl   =  7;
-    Br   =  8;
-    I    =  9;
-    Met  = 10;
+    H = 0;
+    C = 1;
+    N = 2;
+    O = 3;
+    S = 4;
+    P = 5;
+    F = 6;
+    Cl = 7;
+    Br = 8;
+    I = 9;
+    Met = 10;
     SIZE = 11;
     B = 12
 
+
 class AutoDockType:
-    C    =  0;
-    A    =  1;
-    N    =  2;
-    O    =  3;
-    P    =  4;
-    S    =  5;
-    H    =  6;
-    F    =  7;
-    I    =  8;
-    NA   =  9;
-    OA   = 10;
-    SA   = 11;
-    HD   = 12;
-    Mg   = 13;
-    Mn   = 14;
-    Zn   = 15;
-    Ca   = 16;
-    Fe   = 17;
-    Cl   = 18;
-    Br   = 19;
+    C = 0;
+    A = 1;
+    N = 2;
+    O = 3;
+    P = 4;
+    S = 5;
+    H = 6;
+    F = 7;
+    I = 8;
+    NA = 9;
+    OA = 10;
+    SA = 11;
+    HD = 12;
+    Mg = 13;
+    Mn = 14;
+    Zn = 15;
+    Ca = 16;
+    Fe = 17;
+    Cl = 18;
+    Br = 19;
     METAL = 20;
-    B    = 21
+    B = 21
+
 
 class XSType:
-    C_H   =  0;
-    C_P   =  1;
-    N_P   =  2;
-    N_D   =  3;
-    N_A   =  4;
-    N_DA  =  5;
-    O_P   =  6;
-    O_D   =  7;
-    O_A   =  8;
-    O_DA  =  9;
-    S_P   = 10;
-    P_P   = 11;
-    F_H   = 12;
-    Cl_H  = 13;
-    Br_H  = 14;
-    I_H   = 15;
+    C_H = 0;
+    C_P = 1;
+    N_P = 2;
+    N_D = 3;
+    N_A = 4;
+    N_DA = 5;
+    O_P = 6;
+    O_D = 7;
+    O_A = 8;
+    O_DA = 9;
+    S_P = 10;
+    P_P = 11;
+    F_H = 12;
+    Cl_H = 13;
+    Br_H = 14;
+    I_H = 15;
     Met_D = 16;
-    SIZE  = 17
-    B_H   = 18
+    SIZE = 17
+    B_H = 18
 
 
 class AtomData:
@@ -150,7 +154,7 @@ class AtomData:
             self.sminatype_map[entry['smina_type']] = len(self.data)
             # this should be at the end
             self.data.append(entry)
-    
+
     def __getitem__(self, index):
         return self.data[index]
 
@@ -172,4 +176,3 @@ class AtomData:
         """
         if type_key == 'smina_type':
             return self.data[self.sminatype_map[type_filter]]
-

@@ -1,8 +1,11 @@
 import torch.utils.data
 
+
 class BaseDataLoader():
     def __init__(self): pass
+
     def load_data(): return None
+
     def initialize(self, opt): self.opt = opt
 
 
@@ -38,7 +41,11 @@ class CustomDatasetDataLoader(BaseDataLoader):
             if i >= self.opt.max_dataset_size: break
             yield data
 
-    def name(self): return 'CustomDatasetDataLoader'
-    def load_data(self): return self
-    def __len__(self): return min(len(self.dataset), self.opt.max_dataset_size)
+    def name(self):
+        return 'CustomDatasetDataLoader'
 
+    def load_data(self):
+        return self
+
+    def __len__(self):
+        return min(len(self.dataset), self.opt.max_dataset_size)
